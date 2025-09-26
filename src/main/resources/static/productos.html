@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Clientes</title>
+    <script src="/vistaWeb.js"></script>
+    <link rel="stylesheet" href="base.css" />
+  </head>
+  <body>
+    <script src="/utilesVista.js"></script>
+    <div class="container">
+      <h1>Ingreso de Productos</h1>
+
+      <form id="formBuscar" method="POST" action="/buscarProducto">
+        <div class="form-group">
+          <label for="nombre">Nombre del Producto:</label>
+          <input type="text" id="nombre" name="nombre" required />
+          <button type="submit" id="btnBuscar">Buscar</button>
+        </div>
+      </form>
+      
+      <!--4-El usuario selecciona el proveedor, ingresa el precio del producto, la cantidad de unidades, e indica que desea guardar el producto.-->
+      <form id="formGuardar" method="POST" action="/guardarProducto">
+        <div class="form-group">
+          <label for="proveedor">Proveedor:</label>
+          <select name="proveedor" id="proveedor">
+            <option value="proveedor1">Proveedor 1</option>
+            <option value="proveedor2">Proveedor 2</option>
+            <option value="proveedor3">Proveedor 3</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio:</label>
+          <input type="text" id="precio" name="precio" />
+        </div>
+        <div class="form-group">
+          <label for="unidades">Unidades:</label>
+          <input type="text" id="unidades" name="unidades" />
+        </div>
+
+        <button type="submit" id="btnGuardar">Guardar</button>
+      </form>
+
+      <div id="tablaProductos"></div>
+    </div>
+
+    <script>
+      urlIniciarVista = "/productos/vistaConectada";
+      const formBuscar = document.getElementById("formBuscar");
+      const formGuardar = document.getElementById("formGuardar");
+      const nombre = document.getElementById("nombre");
+      const precio = document.getElementById("precio");
+      const unidades = document.getElementById("unidades");
+      const proveedor = document.getElementById("proveedor");
+      const codigo = document.getElementById("codigo");
+      const btnGuardar = document.getElementById("btnGuardar");
+      const tabla = document.getElementById("tablaProductos");
+
+      formBuscar.addEventListener("submit", function (e) {
+        e.preventDefault();
+        submit("/productos/ingresarNombre", serializarFormulario("formBuscar"));
+      });
+
+      formGuardar.addEventListener("submit", function (e) {
+        e.preventDefault();
+        submit("/productos/guardarProducto", serializarFormulario("formGuardar"));
+      });
+
+      function mostrar_productos(productos) {
+        tabla.innerHTML = crearTablaDesdeJson(productos);
+      }
+      // El sistema muestra la lista de productos en formato de tabla (Nombre, Precio, Unidades, Proveedor, Código).
+      function mostrar_producto(producto) {
+        nombre.value = producto.nombre;
+        precio.value = producto.precio;
+        unidades.value = producto.unidades;
+        proveedor.value = producto.proveedor.nombre;
+        codigo.value = producto.codigo;
+      }
+      function mostrar_habilitarIngreso(habilitar) {
+        nombre.value = "";
+        email.value = "";
+        nombre.disabled = !habilitar;
+        email.disabled = !habilitar;
+        btnGuardar.disabled = !habilitar;
+      }
+      function mostrar_limpiarEntradas(limpiar) {
+        nombre.value = "";
+        email.value = "";
+        cedulaInput.value = "";
+      }
+      async function mostrar_mensaje(mensaje) {
+        await mostrarMensaje(mensaje);
+      }
+    </script>
+  </body>
+</html>

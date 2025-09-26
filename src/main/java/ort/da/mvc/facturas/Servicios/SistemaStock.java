@@ -3,6 +3,7 @@ package ort.da.mvc.facturas.Servicios;
 
 import java.util.ArrayList;
 
+import ort.da.mvc.facturas.modelo.Cliente;
 import ort.da.mvc.facturas.modelo.Producto;
 import ort.da.mvc.facturas.modelo.Proveedor;
 
@@ -49,14 +50,39 @@ public class SistemaStock {
         
       
     }
-        
-    public void agregar(Proveedor unProveedor){
-        proveedores.add(unProveedor);
+
+    public boolean existeProducto(String unNombre) {
+           return buscarProducto(unNombre)!=null;
     }
-    
-    public  boolean altaProducto(Producto unProducto){
-        productos.add(unProducto);
+    public Producto buscarProducto(String unNombre) {
+           for(Producto p:productos){
+               if(p.getNombre().equals(unNombre)){
+                   return p;
+               }
+           }
+           return null;
+    }
+
+     public boolean agregar(Producto producto){
+        if(producto==null) return false;
+        boolean ok = false;
+
+        if (producto.validar() && !this.existeProducto(producto.getNombre())){
+            productos.add(producto);
+            ok=true;
+           
+        }
+        
+        return ok;
+    }
+
+    public  boolean altaProveedor(Proveedor unProveedor){
+        proveedores.add(unProveedor);
         return true;
+    }
+
+    public Object generarCodigoProducto() {
+        return "P" + (productos.size() + 1);
     }
    
    
