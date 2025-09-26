@@ -16,7 +16,7 @@ public class ProductoDto {
         this.nombre = producto.getNombre();
         this.precio = producto.getPrecio();
         this.unidades = producto.getUnidades();
-        this.proveedor = producto.getProveedor();
+        this.proveedor = producto.getProveedor().getNombre()!=null ? producto.getProveedor() : new Proveedor("N/A","N/A");
     }
 
     public String getNombre() {

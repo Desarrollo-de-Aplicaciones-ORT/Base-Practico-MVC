@@ -39,8 +39,9 @@ public class ControladorProductos {
         }
         Producto tmp = SistemaStock.getInstancia().buscarProducto(nombre);
         if (tmp != null) {
+            String nombreDelProveedor = tmp.getProveedor() != null ? tmp.getProveedor().getNombre() : "N/A";
             return Respuesta.lista(mensaje("Ya existe el producto"),
-                    producto(tmp));
+                    producto(tmp), new Respuesta("nombreProveedor", nombreDelProveedor));
         }
         return Respuesta.lista(new Respuesta("habilitarIngreso", true));
     }
