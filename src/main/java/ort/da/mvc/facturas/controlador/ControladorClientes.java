@@ -10,6 +10,10 @@ import ort.da.mvc.facturas.Servicios.SistemaClientes;
 import ort.da.mvc.facturas.dto.ClienteDto;
 import ort.da.mvc.facturas.modelo.Cliente;
 import ort.da.mvc.facturas.modelo.Respuesta;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 /**
  *
@@ -21,12 +25,25 @@ import ort.da.mvc.facturas.modelo.Respuesta;
 public class ControladorClientes {
     
     private Cliente cliente = null;
+
+    SistemaClientes sistemaClientes = SistemaClientes.getInstancia();
     
     @PostMapping("/vistaConectada")
     public List<Respuesta> vistaConectada() {
        return Respuesta.lista(clientes(), 
                               new Respuesta("habilitarIngreso",false));
     }
+
+    @PostMapping("/buscarCliente")
+    public ClienteDto getClientesDto(@RequestParam String cedula) {
+        Cliente cliente = sistemaClientes.buscarCliente(cedula.trim());
+        if(cliente==null) return null;
+
+        ClienteDto dto = new ClienteDto(cliente);
+        
+        return dto;
+    }
+    
     
     @PostMapping("/ingresarCedula")
     public List<Respuesta> ingresarCedula(@RequestParam String cedula) {
@@ -41,6 +58,7 @@ public class ControladorClientes {
        }
        return Respuesta.lista(new Respuesta("habilitarIngreso",true));
     }
+
      @PostMapping("/guardarCliente")
     public List<Respuesta> guardarCliente(@RequestParam String nombre,@RequestParam String email) {
         if(cliente == null)  return Respuesta.lista(mensaje("No se ha ingresado una cedula"));

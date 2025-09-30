@@ -53,5 +53,13 @@ public class SistemaFacturas {
       
         return ret;
     }
+
+    public int totalFacturado() {
+        int total = 0;
+        for(Factura f: facturas){
+            total += f.getTotal();
+        }
+        return total;
+    }
    
 }

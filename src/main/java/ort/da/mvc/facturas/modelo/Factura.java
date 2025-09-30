@@ -68,6 +68,14 @@ public class Factura {
         return total;
     }
 
+    public int getTotal() {
+        int total = 0;
+        for(LineaFactura lf:lineas){
+            total+=lf.total();
+        }
+        return total;
+    }
+
    
     
 }
