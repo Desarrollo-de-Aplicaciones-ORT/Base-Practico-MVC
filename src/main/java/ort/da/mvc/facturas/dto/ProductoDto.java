@@ -11,12 +11,14 @@ public class ProductoDto {
     private int precio;
     private int unidades;
     private Proveedor proveedor;
+    private int codigo;
 
     public ProductoDto(Producto producto) {
         this.nombre = producto.getNombre();
         this.precio = producto.getPrecio();
         this.unidades = producto.getUnidades();
-        this.proveedor = producto.getProveedor().getNombre()!=null ? producto.getProveedor() : new Proveedor("N/A","N/A");
+        this.proveedor = producto.getProveedor().getNombre()!=null ? producto.getProveedor() : new Proveedor("N/A");
+        this.codigo = producto.getCodigo();
     }
 
     public String getNombre() {
@@ -33,6 +35,9 @@ public class ProductoDto {
 
     public Proveedor getProveedor() {
         return proveedor;
+    }
+    public int getCodigo() {
+        return codigo;
     }
 
      public static List<ProductoDto> listaDtos(List<Producto> lista){

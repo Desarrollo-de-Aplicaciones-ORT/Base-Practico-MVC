@@ -1,4 +1,3 @@
-
 package ort.da.mvc.facturas.Servicios;
 
 import java.util.ArrayList;
@@ -64,16 +63,21 @@ public class SistemaStock {
     }
 
      public boolean agregar(Producto producto){
-        if(producto==null) return false;
-        boolean ok = false;
-
-        if (producto.validar() && !this.existeProducto(producto.getNombre())){
-            productos.add(producto);
-            ok=true;
-           
+        if(producto == null) {
+            System.out.println("Error: El producto es null.");
+            return false;
         }
-        
-        return ok;
+        if (!producto.validar()) {
+            System.out.println("Error: El producto no pasó la validación.");
+            return false;
+        }
+        if (this.existeProducto(producto.getNombre())) {
+            System.out.println("Error: Ya existe un producto con el nombre '" + producto.getNombre() + "'.");
+            return false;
+        }
+        productos.add(producto);
+        System.out.println("Producto agregado correctamente: " + producto.getNombre());
+        return true;
     }
 
     public  boolean altaProveedor(Proveedor unProveedor){
@@ -83,6 +87,15 @@ public class SistemaStock {
 
     public Object generarCodigoProducto() {
         return "P" + (productos.size() + 1);
+    }
+
+    public Proveedor buscarProveedor(String nombreDelProveedor) {
+        for (Proveedor proveedor : proveedores) {
+            if (proveedor.getNombre().equalsIgnoreCase(nombreDelProveedor)) {
+                return proveedor;
+            }
+        }
+        return null;
     }
    
    

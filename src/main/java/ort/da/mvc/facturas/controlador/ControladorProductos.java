@@ -18,6 +18,7 @@ import ort.da.mvc.facturas.modelo.Respuesta;
 @RequestMapping("/productos")
 public class ControladorProductos {
     private Producto producto = null;
+    SistemaStock sistemaStock = SistemaStock.getInstancia();
 
     @GetMapping
     public List<ProductoDto> obtenerProductos() {
@@ -48,12 +49,14 @@ public class ControladorProductos {
 
     @PostMapping("/guardarProducto")
     public List<Respuesta> guardarProducto(@RequestParam String nombre, @RequestParam int precio,
-            @RequestParam int unidades, @RequestParam Proveedor proveedor) {
-        if (producto == null)
-            return Respuesta.lista(mensaje("No se ha ingresado un producto"));
+            @RequestParam int unidades, @RequestParam String nombreDelProveedor) {
+        /*if (producto == null)
+            return Respuesta.lista(mensaje("No se ha ingresado un producto"));*/
+        Producto producto = new Producto();
         producto.setNombre(nombre);
         producto.setPrecio(precio);
         producto.setUnidades(unidades);
+        Proveedor proveedor = sistemaStock.buscarProveedor(nombreDelProveedor);
         producto.setProveedor(proveedor);
         producto.setCodigo(SistemaStock.getInstancia().generarCodigoProducto());
         if (SistemaStock.getInstancia().agregar(producto)) {
