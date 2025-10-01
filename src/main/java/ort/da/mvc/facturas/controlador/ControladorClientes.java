@@ -74,6 +74,12 @@ public class ControladorClientes {
         }
     }
 
+    @GetMapping("/compraronElMasBarato")
+    public List<ClienteDto> getCompraronMasBarato(@RequestParam String param) {
+        return new String();
+    }
+    
+
     private Respuesta clientes() {
         
         return new Respuesta("clientes",

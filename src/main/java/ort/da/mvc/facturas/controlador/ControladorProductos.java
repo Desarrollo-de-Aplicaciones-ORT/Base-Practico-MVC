@@ -69,6 +69,12 @@ public class ControladorProductos {
         }
     }
 
+    @GetMapping("/productoMasBarato")
+    public Producto getMasBarato() {
+        return sistemaStock.productoMasBarato();
+    }
+    
+
     private Respuesta productos() {
 
         return new Respuesta("productos",

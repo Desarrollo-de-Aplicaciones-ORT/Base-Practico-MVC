@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Clientes</title>
+    <script src="/vistaWeb.js"></script>
+    <link rel="stylesheet" href="base.css" />
+  </head>
+  <body>
+    <script src="/utilesVista.js"></script>
+    <div class="container">
+      <h2>Consulta de clientes que compraron el producto mas barato</h2>
+      <div class="form-group">
+        <label for="productoMasBarato"></label>
+        <div class="form-group" id="productoMasBarato"></div>
+      </div>
+    </div>
+    <script>
+      async function mostrar_mensaje(mensaje) {
+        await mostrarMensaje(mensaje);
+      }
+      // === Total Facturado ===
+      async function cargarProductoMasBarato() {
+        try {
+          const res = await fetch("/facturas/totalFacturado");
+          if (!res.ok) throw new Error("Error al obtener total facturado");
+          const total = await res.json();
+          totalFacturado.innerText = `Total Facturado: $${total}`;
+        } catch (err) {
+          console.error("Error al cargar total facturado:", err);
+        }
+      }
+      window.addEventListener("DOMContentLoaded", cargarTotalFacturado);
+    </script>
+  </body>
+</html>

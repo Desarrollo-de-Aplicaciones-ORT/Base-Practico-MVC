@@ -97,6 +97,18 @@ public class SistemaStock {
         }
         return null;
     }
+
+    public Producto productoMasBarato() {
+        int precioMenor = Integer.MAX_VALUE;
+        Producto productoMasBarato = new Producto();
+        for(Producto p : productos){
+            if(p.getPrecio() < precioMenor){
+                precioMenor = p.getPrecio();
+                productoMasBarato = p;
+            }
+        }
+        return productoMasBarato;
+    }
    
    
 }
