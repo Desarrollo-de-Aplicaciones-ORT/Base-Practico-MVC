@@ -11,28 +11,70 @@
   <body>
     <script src="/utilesVista.js"></script>
     <div class="container">
-      <h2>Consulta de clientes que compraron el producto mas barato</h2>
-      <div class="form-group">
-        <label for="productoMasBarato"></label>
-        <div class="form-group" id="productoMasBarato"></div>
+      <div class="container">
+        <h2>Producto Mas Barato:</h2>
+        <div class="table" id="tablaDelProducto"></div>
+      </div>
+      <div class="container">
+        <h2>Clientes que lo compraron:</h2>
+        <div class="table" id="tablaClientes"></div>
       </div>
     </div>
     <script>
-      async function mostrar_mensaje(mensaje) {
-        await mostrarMensaje(mensaje);
-      }
+      urlIniciarVista = "/clientes/vistaConectada";
+      const tablaDelProducto = document.getElementById("tablaDelProducto");
       // === Total Facturado ===
       async function cargarProductoMasBarato() {
         try {
-          const res = await fetch("/facturas/totalFacturado");
+          //Traer producto mas barato
+          const res = await fetch("/productos/productoMasBarato");
           if (!res.ok) throw new Error("Error al obtener total facturado");
           const total = await res.json();
-          totalFacturado.innerText = `Total Facturado: $${total}`;
+          //Crear tabla con respuesta
+          const tablaHtml = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Codigo</th>
+                  <th>Nombre</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${total.codigo}</td>
+                  <td>${total.nombre}</td>
+                  <td>${total.precio}</td>
+                  <td>${total.unidades}</td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+          //Instertar tabla en el div
+          tablaDelProducto.innerHTML = tablaHtml;
         } catch (err) {
           console.error("Error al cargar total facturado:", err);
         }
       }
-      window.addEventListener("DOMContentLoaded", cargarTotalFacturado);
+      window.addEventListener("DOMContentLoaded", cargarProductoMasBarato);
+
+      // === Clientes que compraron el producto mas barato ===
+      async function cargarClientesQueCompraron() {
+        try {
+          //Traer producto mas barato
+          const res = await fetch("/clientes/compraronElMasBarato");
+          if (!res.ok) throw new Error("Error al obtener clientes");
+          const clientes = await res.json();
+          //Crear tabla con respuesta
+          const tablaHtml = crearTablaDesdeJson(clientes);
+          //Instertar tabla en el div
+          document.getElementById("tablaClientes").innerHTML = tablaHtml;
+        } catch (err) {
+          console.error("Error al cargar clientes:", err);
+        }
+      }
+      window.addEventListener("DOMContentLoaded", cargarClientesQueCompraron);
     </script>
   </body>
 </html>

@@ -46,8 +46,18 @@ public class SistemaStock {
         }            
         
         return menor;
-        
-      
+    }
+
+    public Producto productoMasBarato() {
+        int precioMenor = Integer.MAX_VALUE;
+        Producto productoMasBarato = new Producto();
+        for(Producto p : productos){
+            if(p.getPrecio() < precioMenor){
+                precioMenor = p.getPrecio();
+                productoMasBarato = p;
+            }
+        }
+        return productoMasBarato;
     }
 
     public boolean existeProducto(String unNombre) {
@@ -85,8 +95,8 @@ public class SistemaStock {
         return true;
     }
 
-    public Object generarCodigoProducto() {
-        return "P" + (productos.size() + 1);
+    public int generarCodigoProducto() {
+        return productos.size() + 1;
     }
 
     public Proveedor buscarProveedor(String nombreDelProveedor) {
@@ -98,17 +108,7 @@ public class SistemaStock {
         return null;
     }
 
-    public Producto productoMasBarato() {
-        int precioMenor = Integer.MAX_VALUE;
-        Producto productoMasBarato = new Producto();
-        for(Producto p : productos){
-            if(p.getPrecio() < precioMenor){
-                precioMenor = p.getPrecio();
-                productoMasBarato = p;
-            }
-        }
-        return productoMasBarato;
-    }
+    
    
    
 }

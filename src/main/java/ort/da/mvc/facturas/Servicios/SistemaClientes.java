@@ -51,8 +51,20 @@ public class SistemaClientes {
             }
             
         }
-        return retorno;
+        return retorno;    
+    }
+
+    public ArrayList<Cliente> clientesQueCompraronElMasBarato() {
+        Producto masBarato = SistemaStock.getInstancia().productoMasBarato();
+        ArrayList<Cliente> retorno = new ArrayList();
         
+        for(Cliente c: clientes){
+            if ( SistemaFacturas.getInstancia().clienteComproProducto(c, masBarato)){
+                retorno.add(c);
+            }
+            
+        }
+        return retorno;    
     }
 
     public boolean existeCliente(String unaCedula) {

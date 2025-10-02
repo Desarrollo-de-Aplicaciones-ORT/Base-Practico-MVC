@@ -12,12 +12,11 @@
     <script src="/utilesVista.js"></script>
     <div class="container">
       <h1>Ingreso de Facturas</h1>
-      <div class="form-group">
-        <label for="totalFacturado"></label>
-        <div class="form-group" id="totalFacturado"></div>
+      <div class="container">
+        <div class="container" id="totalFacturado"></div>
       </div>
 
-      <form id="formBuscar" method="POST" action="/clientes/buscarCliente">
+      <form id="formBuscar" method="POST" action="/facturas/buscarCliente">
         <div class="form-group">
           <label for="cedula">Cédula:</label>
           <input type="text" id="cedula" name="cedula" required />
@@ -25,224 +24,20 @@
         </div>
       </form>
 
-      <div id="tablaCliente"></div>
-
-      <div id="facturaContainer" class="container">
+      <div id="facturaContainer" class="container" display="block">
         <h2>Factura</h2>
-        <div class="form-group">
-          <label>Cliente:</label>
-          <span id="facturaCliente"></span>
-        </div>
-        <div class="form-group">
-          <label>Fecha:</label>
-          <span id="facturaFecha"></span>
-        </div>
-        <div class="form-group">
-          <label>Total:</label>
-          <span id="facturaTotal">$0.00</span>
-        </div>
-
-        <div id="agregarProducto" style="margin-top: 20px">
-          <h3>Agregar Producto</h3>
-          <div class="form-group">
-            <label for="productoSelect">Producto:</label>
-            <select id="productoSelect"></select>
-          </div>
-          <div class="form-group">
-            <label for="cantidadInput">Cantidad:</label>
-            <input type="number" id="cantidadInput" min="1" value="1" />
-          </div>
-          <button id="btnAgregarProducto" type="button">
-            Agregar a la Factura
-          </button>
-        </div>
-
-        <div id="detalleFactura" style="margin-top: 20px">
-          <h3>Detalle de la Factura</h3>
-          <table id="tablaDetalleFactura" border="1">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+        <div class="table" id="tablaFactura"></div>
       </div>
     </div>
 
     <script>
-      async function mostrar_mensaje(mensaje) {
-        await mostrarMensaje(mensaje);
+      //DOM
+      const totalFacturado = document.getElementById("totalFacturado");
+
+      //Cargar el total facturado en el sistema
+      function cargarTotalFacturado(){
+        
       }
-      // === Total Facturado ===
-      async function cargarTotalFacturado() {
-        try {
-          const res = await fetch("/facturas/totalFacturado");
-          if(!res.ok) throw new Error("Error al obtener total facturado");
-            const total = await res.json();
-            totalFacturado.innerText = `Total Facturado: $${total}`;
-        } catch (err) {
-          console.error("Error al cargar total facturado:", err);
-        }
-      }
-      window.addEventListener("DOMContentLoaded", cargarTotalFacturado);
-      // === CLIENTE ===
-      formBuscar.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        fetch("/clientes/buscarCliente", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ cedula: cedula.value }),
-        })
-          .then((resp) => {
-            if (!resp.ok) throw new Error("Cliente no encontrado");
-            return resp.json();
-          })
-          .then((cliente) => {
-            mostrarClienteEnTabla(cliente);
-            iniciarFactura(cliente);
-          })
-          .catch((err) => {
-            alert(err.message);
-            document.getElementById("tablaCliente").innerHTML = "";
-            document.getElementById("facturaContainer").style.display = "none";
-          });
-      });
-
-      function mostrarClienteEnTabla(cliente) {
-        if (!cliente) {
-          document.getElementById("tablaCliente").innerHTML =
-            "<p>No existe el cliente</p>";
-          return;
-        }
-
-        const tablaHTML = `
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Cédula</th>
-                    <th>Email</th>
-                    <th>Última Compra</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>${cliente.nombre}</td>
-                    <td>${cliente.cedula}</td>
-                    <td>${cliente.email}</td>
-                    <td>${
-                      cliente.ultimaCompra ? cliente.ultimaCompra : "-"
-                    }</td>
-                </tr>
-            </tbody>
-        </table>
-    `;
-
-        document.getElementById("tablaCliente").innerHTML = tablaHTML;
-      }
-
-      // === FACTURA ===
-      function iniciarFactura(cliente) {
-        document.getElementById("facturaContainer").style.display = "block";
-        document.getElementById("facturaCliente").innerText = cliente.nombre;
-
-        const hoy = new Date();
-        const dia = String(hoy.getDate()).padStart(2, "0");
-        const mes = String(hoy.getMonth() + 1).padStart(2, "0");
-        const anio = hoy.getFullYear();
-        document.getElementById(
-          "facturaFecha"
-        ).innerText = `${dia}/${mes}/${anio}`;
-        document.getElementById("facturaTotal").innerText = "$0.00";
-      }
-
-      // === PRODUCTOS ===
-      let productos = [];
-
-      async function cargarProductos() {
-        try {
-          const res = await fetch("/productos");
-          productos = await res.json();
-
-          const select = document.getElementById("productoSelect");
-          select.innerHTML = "";
-          productos.forEach((p) => {
-            const option = document.createElement("option");
-            option.value = p.nombre;
-            option.text = `${p.nombre} - $${p.precio}`;
-            select.appendChild(option);
-          });
-        } catch (err) {
-          console.error("Error al cargar productos:", err);
-        }
-      }
-
-      let detalleFactura = [];
-
-      function agregarProductosAFactura() {
-        const productoNombre = document.getElementById("productoSelect").value;
-        const cantidad = parseInt(
-          document.getElementById("cantidadInput").value
-        );
-
-        if (cantidad <= 0) return;
-
-        const producto = productos.find((p) => p.nombre === productoNombre);
-        if (!producto) {
-          mostrar_mensaje("Producto no encontrado");
-          return;
-        }
-
-        const itemExistente = detalleFactura.find(
-          (p) => p.nombre === productoNombre
-        );
-        if (itemExistente) {
-          itemExistente.cantidad += cantidad;
-          itemExistente.subtotal = itemExistente.cantidad * producto.precio;
-        } else {
-          detalleFactura.push({
-            nombre: producto.nombre,
-            cantidad: cantidad,
-            precioUnitario: producto.precio,
-            subtotal: cantidad * producto.precio,
-          });
-        }
-        actualizarTablaFactura();
-      }
-
-      function actualizarTablaFactura() {
-        const tbody = document.querySelector("#tablaDetalleFactura tbody");
-        tbody.innerHTML = "";
-
-        let total = 0;
-        detalleFactura.forEach((p) => {
-          total += p.subtotal;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-        <td>${p.nombre}</td>
-        <td>${p.cantidad}</td>
-        <td>$${p.precioUnitario.toFixed(2)}</td>
-        <td>$${p.subtotal.toFixed(2)}</td>
-      `;
-          tbody.appendChild(tr);
-        });
-        document.getElementById("facturaTotal").innerText = `$${total.toFixed(
-          2
-        )}`;
-      }
-
-      document
-        .getElementById("btnAgregarProducto")
-        .addEventListener("click", agregarProductosAFactura);
-      window.addEventListener("DOMContentLoaded", cargarProductos);
     </script>
   </body>
 </html>

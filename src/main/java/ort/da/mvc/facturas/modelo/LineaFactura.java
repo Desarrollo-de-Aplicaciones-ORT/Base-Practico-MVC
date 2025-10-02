@@ -5,6 +5,7 @@
  */
 package ort.da.mvc.facturas.modelo;
 
+
 /**
  *
  * @author magda
@@ -18,6 +19,7 @@ public class LineaFactura {
         this.producto = producto;
         this.cantidad = cantidad;
     }
+
 
     public Producto getProducto() {
         return producto;

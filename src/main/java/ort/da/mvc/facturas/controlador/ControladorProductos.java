@@ -14,22 +14,36 @@ import ort.da.mvc.facturas.modelo.Producto;
 import ort.da.mvc.facturas.modelo.Proveedor;
 import ort.da.mvc.facturas.modelo.Respuesta;
 
+
 @RestController
 @RequestMapping("/productos")
 public class ControladorProductos {
     private Producto producto = null;
-    SistemaStock sistemaStock = SistemaStock.getInstancia();
 
-    @GetMapping
-    public List<ProductoDto> obtenerProductos() {
-        return ProductoDto.listaDtos(SistemaStock.getInstancia().getProductos());
-    }
+    SistemaStock sistemaStock = SistemaStock.getInstancia();
 
     @PostMapping("/vistaConectada")
     public List<Respuesta> vistaConectada() {
         return Respuesta.lista(productos(),
                 new Respuesta("habilitarIngreso", false));
     }
+
+    @GetMapping
+    public Respuesta obtenerProductos() {
+        return new Respuesta("productos",
+                ProductoDto.listaDtos(sistemaStock.getProductos()));
+    }
+
+    @PostMapping("/buscarProducto")
+    public ProductoDto getProductoDto(@RequestParam String nombre ) {
+        Producto producto = sistemaStock.buscarProducto(nombre.trim());
+        if (producto == null) return null;
+
+        ProductoDto dto = new ProductoDto(producto);
+        
+        return dto;
+    }
+    
 
     @PostMapping("/ingresarNombre")
     public List<Respuesta> ingresarNombre(@RequestParam String nombre) {
@@ -38,7 +52,9 @@ public class ControladorProductos {
         if (!nombreValido) {
             return Respuesta.lista(mensaje("Nombre incorrecto"));
         }
-        Producto tmp = SistemaStock.getInstancia().buscarProducto(nombre);
+        Producto tmp = sistemaStock.buscarProducto(nombre);
+        // Si ya existe el producto, se muestra su info y no se permite ingresar
+        // uno nuevo
         if (tmp != null) {
             String nombreDelProveedor = tmp.getProveedor() != null ? tmp.getProveedor().getNombre() : "N/A";
             return Respuesta.lista(mensaje("Ya existe el producto"),
@@ -48,18 +64,17 @@ public class ControladorProductos {
     }
 
     @PostMapping("/guardarProducto")
-    public List<Respuesta> guardarProducto(@RequestParam String nombre, @RequestParam int precio,
+    public List<Respuesta> guardarProducto(@RequestParam int precio,
             @RequestParam int unidades, @RequestParam String nombreDelProveedor) {
-        /*if (producto == null)
-            return Respuesta.lista(mensaje("No se ha ingresado un producto"));*/
-        Producto producto = new Producto();
-        producto.setNombre(nombre);
+        if (producto == null)
+            return Respuesta.lista(mensaje("No se ha ingresado un producto"));
+        // Completar los datos del producto
         producto.setPrecio(precio);
         producto.setUnidades(unidades);
         Proveedor proveedor = sistemaStock.buscarProveedor(nombreDelProveedor);
         producto.setProveedor(proveedor);
-        producto.setCodigo(SistemaStock.getInstancia().generarCodigoProducto());
-        if (SistemaStock.getInstancia().agregar(producto)) {
+        producto.setCodigo(sistemaStock.generarCodigoProducto());
+        if (sistemaStock.agregar(producto)) {
             producto = null;
             return Respuesta.lista(productos(),
                     new Respuesta("limpiarEntradas", true),

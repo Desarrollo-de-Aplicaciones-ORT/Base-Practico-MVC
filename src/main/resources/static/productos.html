@@ -15,7 +15,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
   <body>
     <script src="/utilesVista.js"></script>
     <div class="container">
-      <h1>Ingreso de Productos</h1>
+      <h1>Alta de Productos</h1>
 
       <form id="formBuscar" method="POST" action="/buscarProducto">
         <div class="form-group">
@@ -24,13 +24,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
           <button type="submit" id="btnBuscar">Buscar</button>
         </div>
       </form>
-      
+
       <!--4-El usuario selecciona el proveedor, ingresa el precio del producto, la cantidad de unidades, e indica que desea guardar el producto.-->
       <form id="formGuardar" method="POST" action="/productos/guardarProducto">
-        <div class="form-group">
-          <label for="nombre">Nombre del Producto:</label>
-          <input type="text" id="nombre" name="nombre" required />
-        </div>
         <div class="form-group">
           <label for="nombreDelProveedor">Proveedor:</label>
           <select name="nombreDelProveedor" id="proveedor">
@@ -60,7 +56,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
       const precio = document.getElementById("precio");
       const unidades = document.getElementById("unidades");
       const proveedor = document.getElementById("proveedor");
-      const codigo = document.getElementById("codigo");
       const btnGuardar = document.getElementById("btnGuardar");
       const tabla = document.getElementById("tablaProductos");
 
@@ -71,7 +66,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
       formGuardar.addEventListener("submit", function (e) {
         e.preventDefault();
-        submit("/productos/guardarProducto", serializarFormulario("formGuardar"));
+        submit(
+          "/productos/guardarProducto",
+          serializarFormulario("formGuardar")
+        );
       });
 
       function mostrar_productos(productos) {
@@ -83,19 +81,18 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
         precio.value = producto.precio;
         unidades.value = producto.unidades;
         proveedor.value = producto.proveedor.nombre;
-        codigo.value = producto.codigo;
       }
       function mostrar_habilitarIngreso(habilitar) {
-        nombre.value = "";
-        email.value = "";
-        nombre.disabled = !habilitar;
-        email.disabled = !habilitar;
+        unidades.value = "";
+        precio.disabled = !habilitar;
+        unidades.disabled = !habilitar;
+        proveedor.disabled = !habilitar;
         btnGuardar.disabled = !habilitar;
       }
       function mostrar_limpiarEntradas(limpiar) {
         nombre.value = "";
-        email.value = "";
-        cedulaInput.value = "";
+        precio.value = "";
+        unidades.value = "";
       }
       async function mostrar_mensaje(mensaje) {
         await mostrarMensaje(mensaje);
@@ -103,12 +100,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
 
       // Llama a tu endpoint que devuelve los proveedores
       async function cargarProveedores() {
-        const response = await fetch('/proveedores'); // Ajusta la URL según tu backend
+        const response = await fetch("/proveedores"); // Ajusta la URL según tu backend
         const proveedores = await response.json();
-        const select = document.getElementById('proveedor');
-        select.innerHTML = '';
-        proveedores.forEach(p => {
-          const option = document.createElement('option');
+        const select = document.getElementById("proveedor");
+        select.innerHTML = "";
+        proveedores.forEach((p) => {
+          const option = document.createElement("option");
           option.value = p.nombre; // O el campo que uses como identificador
           option.textContent = p.nombre;
           select.appendChild(option);
@@ -116,22 +113,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
       }
 
       // Llama a la función al cargar la página
-      window.addEventListener('DOMContentLoaded', cargarProveedores);
+      window.addEventListener("DOMContentLoaded", cargarProveedores);
 
       function crearTablaDesdeJson(productos) {
-  let html = "<table><tr><th>Nombre</th><th>Precio</th><th>Unidades</th><th>Proveedor</th><th>Código</th></tr>";
-  productos.forEach(producto => {
-    html += `<tr>
+        let html =
+          "<table><tr><th>Nombre</th><th>Precio</th><th>Unidades</th><th>Proveedor</th><th>Código</th></tr>";
+        productos.forEach((producto) => {
+          html += `<tr>
       <td>${producto.nombre}</td>
       <td>${producto.precio}</td>
       <td>${producto.unidades}</td>
       <td>${producto.proveedor.nombre}</td>
       <td>${producto.codigo}</td>
     </tr>`;
-  });
-  html += "</table>";
-  return html;
-}
+        });
+        html += "</table>";
+        return html;
+      }
     </script>
   </body>
 </html>

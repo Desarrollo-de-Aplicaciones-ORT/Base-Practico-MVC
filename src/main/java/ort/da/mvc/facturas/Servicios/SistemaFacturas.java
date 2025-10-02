@@ -61,5 +61,11 @@ public class SistemaFacturas {
         }
         return total;
     }
+
+    public Factura iniciarFactura(Cliente cliente) {
+        Factura nueva = new Factura(cliente);
+        this.agregar(nueva);
+        return nueva;
+    }
    
 }

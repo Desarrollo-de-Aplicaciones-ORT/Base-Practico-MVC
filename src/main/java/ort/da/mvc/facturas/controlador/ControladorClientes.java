@@ -11,7 +11,7 @@ import ort.da.mvc.facturas.dto.ClienteDto;
 import ort.da.mvc.facturas.modelo.Cliente;
 import ort.da.mvc.facturas.modelo.Respuesta;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -75,8 +75,9 @@ public class ControladorClientes {
     }
 
     @GetMapping("/compraronElMasBarato")
-    public List<ClienteDto> getCompraronMasBarato(@RequestParam String param) {
-        return new String();
+    public List<ClienteDto> getCompraronMasBarato() {
+        List<Cliente> clientes = sistemaClientes.clientesQueCompraronElMasBarato();
+        return clientes.stream().map(c -> new ClienteDto(c)).toList();
     }
     
 
@@ -86,10 +87,14 @@ public class ControladorClientes {
                       ClienteDto.listaDtos(SistemaClientes.getInstancia().getClientes()));
         
     }
+
+
     private Respuesta mensaje(String texto) {
         return new Respuesta("mensaje",texto);
         
     }
+
+
     private Respuesta cliente(Cliente c) {
         
         return new Respuesta("cliente",
