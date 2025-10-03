@@ -38,7 +38,7 @@ public class Factura {
         return lineas;
     }
 
-    public boolean agregar(int cantidad, Producto p){
+    public boolean agregarLinea(int cantidad, Producto p){
         LineaFactura nuevaLinea = new LineaFactura(p, cantidad);
         lineas.add(nuevaLinea);
         return true;

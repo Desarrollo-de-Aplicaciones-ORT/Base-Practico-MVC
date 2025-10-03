@@ -72,6 +72,15 @@ public class SistemaStock {
            return null;
     }
 
+    public Producto buscarProductoPorCodigo(int codigo) {
+        for(Producto p:productos){
+            if(p.getCodigo() == codigo){
+                return p;
+            }
+        }
+        return null;
+    }
+
      public boolean agregar(Producto producto){
         if(producto == null) {
             System.out.println("Error: El producto es null.");

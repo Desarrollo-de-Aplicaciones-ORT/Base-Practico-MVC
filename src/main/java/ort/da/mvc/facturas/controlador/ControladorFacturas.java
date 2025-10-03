@@ -4,9 +4,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ort.da.mvc.facturas.Servicios.SistemaClientes;
 import ort.da.mvc.facturas.Servicios.SistemaFacturas;
+import ort.da.mvc.facturas.Servicios.SistemaStock;
 import ort.da.mvc.facturas.dto.FacturaDto;
 import ort.da.mvc.facturas.modelo.Cliente;
 import ort.da.mvc.facturas.modelo.Factura;
+import ort.da.mvc.facturas.modelo.Producto;
 import ort.da.mvc.facturas.modelo.Respuesta;
 
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ public class ControladorFacturas {
 
     SistemaFacturas sistemaFacturas = SistemaFacturas.getInstancia();
     SistemaClientes sistemaClientes = SistemaClientes.getInstancia();
+    SistemaStock sistemaStock = SistemaStock.getInstancia();
 
     @PostMapping("/vistaConectada")
     public List<Respuesta> vistaConectada() {
@@ -59,15 +62,33 @@ public class ControladorFacturas {
     }
 
     private Respuesta facturas() {
-        
+
         return new Respuesta("facturas",
-                      FacturaDto.listaDtos(sistemaFacturas.getFacturas()));
-        
+                FacturaDto.listaDtos(sistemaFacturas.getFacturas()));
+
     }
 
+    @PostMapping("/agregarLineaFactura")
+    public List<Respuesta> agregarLineaFactura(@RequestParam int codigo, @RequestParam int cantidad) {
+        Producto producto = sistemaStock.buscarProductoPorCodigo(codigo);
+        if (producto == null) {
+            return Respuesta.lista(mensaje("Producto no encontrado"));
+        }
+        // Calcular el total de la línea
+        int totalLinea = producto.getPrecio() * cantidad;
+        // Agregar el producto a la factura
+        sistemaFacturas.agregarLineaFactura(factura, producto, cantidad);
+        // Retornar la respuesta con los datos actualizados
+        return Respuesta.lista(
+                new Respuesta("nombreProducto", producto.getNombre()),
+                new Respuesta("cantidad", String.valueOf(cantidad)),
+                new Respuesta("totalLinea", String.valueOf(totalLinea))
+
+        );
+    }
 
     private Respuesta mensaje(String texto) {
-        return new Respuesta("mensaje",texto);
+        return new Respuesta("mensaje", texto);
     }
 
 }

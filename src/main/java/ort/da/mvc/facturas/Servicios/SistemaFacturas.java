@@ -67,5 +67,8 @@ public class SistemaFacturas {
         this.agregar(nueva);
         return nueva;
     }
-   
+
+    public void agregarLineaFactura(Factura factura, Producto producto, int cantidad) {
+        factura.agregarLinea(cantidad, producto);
+    }
 }

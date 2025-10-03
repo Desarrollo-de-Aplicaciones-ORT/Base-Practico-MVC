@@ -16,7 +16,7 @@
         <div class="container" id="totalFacturado"></div>
       </div>
 
-      <form id="formBuscar" method="POST" action="/facturas/buscarCliente">
+      <form id="formBuscar">
         <div class="form-group">
           <label for="cedula">Cédula:</label>
           <input type="text" id="cedula" name="cedula" required />
@@ -24,20 +24,167 @@
         </div>
       </form>
 
-      <div id="facturaContainer" class="container" display="block">
+      <div id="facturaContainer" class="container" style="display: none">
         <h2>Factura</h2>
         <div class="table" id="tablaFactura"></div>
+      </div>
+
+      <form id="formAgregar" style="display: none">
+        <div class="form-group">
+          <label for="codigo">Codigo:</label>
+          <input type="number" id="codigo" name="codigo" required />
+          <label for="cantidad">Cantidad:</label>
+          <input type="number" id="cantidad" name="cantidad" required />
+          <button type="submit" id="btnAgregar">Agregar</button>
+        </div>
+      </form>
+
+      <div id="lineaFacturaContainer" class="container" style="display: none">
+        <h2>Líneas de Factura</h2>
+        <div class="table" id="tablaLineaFactura"></div>
       </div>
     </div>
 
     <script>
       //DOM
       const totalFacturado = document.getElementById("totalFacturado");
+      const facturaContainer = document.getElementById("facturaContainer");
+      const tablaFactura = document.getElementById("tablaFactura");
+      const formBuscar = document.getElementById("formBuscar");
+      const formAgregar = document.getElementById("formAgregar");
+      const codigo = document.getElementById("codigo");
+      const cantidad = document.getElementById("cantidad");
+      const lineaFacturaContainer = document.getElementById(
+        "lineaFacturaContainer"
+      );
+      const tablaLineaFactura = document.getElementById("tablaLineaFactura");
+      let lineasFactura = []; // Array para almacenar las líneas de factura
 
       //Cargar el total facturado en el sistema
-      function cargarTotalFacturado(){
-        
+      function cargarTotalFacturado() {
+        fetch("/facturas/totalFacturado")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error en la respuesta" + response.statusText);
+            }
+            return response.text();
+          })
+          .then((data) => {
+            console.log("Total facturado:", data);
+            totalFacturado.innerText = `Total Facturado en el Sistema: $${data}`;
+          })
+          .catch((error) => {
+            console.error("Error al obtener el total facturado:", error);
+          });
       }
+
+      //Mostrar la factura del cliente buscado
+      function buscarClienteYMostrarFactura(cedula) {
+        fetch("/facturas/ingresarCedula", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "cedula=" + encodeURIComponent(cedula),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error en la respuesta" + response.statusText);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Datos de la factura:", data);
+            tablaFactura.innerHTML = ""; // Limpiar contenido previo
+
+            if (data.error) {
+              tablaFactura.innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+              tablaFactura.innerHTML = crearTablaDesdeJson(data);
+            }
+
+            // Mostrar el contenedor de la factura
+            facturaContainer.style.display = "block";
+            //Mostrar el formulario para agregar productos a la factura
+            formAgregar.style.display = "block";
+            // Actualizar el total facturado
+            cargarTotalFacturado();
+          })
+          .catch((error) => {
+            console.error(
+              "Error al buscar el cliente y mostrar la factura:",
+              error
+            );
+            tablaFactura.innerHTML =
+              "<p>Error al buscar el cliente. Por favor, inténtelo de nuevo.</p>";
+            facturaContainer.style.display = "block";
+          });
+      }
+
+      //Funcion para agregar productos a la factura
+      function agregarProductoAFactura(codigo, cantidad) {
+        fetch("/facturas/agregarLineaFactura", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `codigo=${encodeURIComponent(
+            codigo
+          )}&cantidad=${encodeURIComponent(cantidad)}`,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error en la respuesta " + response.statusText);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Datos de la línea de factura:", data);
+
+            if (data.error) {
+              tablaLineaFactura.innerHTML = `<p style="color:red;">${data.error}</p>`;
+            } else {
+              
+              lineasFactura.push(data); // Agregar la nueva línea al array
+              console.log("Líneas de factura actualizadas:", lineasFactura);
+              // Redibujar la tabla con todas las líneas
+              tablaLineaFactura.innerHTML = crearTablaDesdeJson(lineasFactura);
+            }
+
+            // Actualizar el total facturado
+            cargarTotalFacturado();
+          })
+          .catch((error) => {
+            console.error("Error al agregar el producto a la factura:", error);
+            tablaLineaFactura.innerHTML =
+              "<p>Error al agregar el producto. Por favor, inténtelo de nuevo.</p>";
+          });
+      }
+
+      //Escuchar el evento submit del formulario de búsqueda
+      formBuscar.addEventListener("submit", function (event) {
+        event.preventDefault(); // Evitar el envío del formulario
+        const cedula = document.getElementById("cedula").value;
+        buscarClienteYMostrarFactura(cedula);
+      });
+
+      // Evento del formulario
+      document
+        .getElementById("formAgregar")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Evita recargar la página
+          if (codigo.value && cantidad.value) {
+            agregarProductoAFactura(codigo.value, cantidad.value);
+            lineaFacturaContainer.style.display = "block"; // Mostrar el contenedor de líneas de factura
+            codigo.value = ""; // Limpiar el campo código
+            cantidad.value = ""; // Limpiar el campo cantidad
+          } else {
+            alert("Por favor, complete ambos campos: Código y Cantidad.");
+          }
+        });
+
+      //Llamar a la función al cargar la página
+      window.addEventListener("DOMContentLoaded", cargarTotalFacturado);
     </script>
   </body>
 </html>

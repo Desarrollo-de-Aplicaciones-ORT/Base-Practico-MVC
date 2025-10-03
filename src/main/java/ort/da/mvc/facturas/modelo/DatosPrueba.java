@@ -48,23 +48,23 @@ public class DatosPrueba {
         SistemaFacturas sFacturas = SistemaFacturas.getInstancia();
 
         Factura f1 = new Factura(juan);
-        f1.agregar(30, caramelo);
-        f1.agregar(2, camisa);
-        f1.agregar(1, computadora);
+        f1.agregarLinea(30, caramelo);
+        f1.agregarLinea(2, camisa);
+        f1.agregarLinea(1, computadora);
 
         sFacturas.agregar(f1);
 
         Factura f2 = new Factura(ana);
-        f2.agregar(400, caramelo);
-        f2.agregar(20, camisa);
-        f2.agregar(10, computadora);
+        f2.agregarLinea(400, caramelo);
+        f2.agregarLinea(20, camisa);
+        f2.agregarLinea(10, computadora);
 
         sFacturas.agregar(f2);
 
         Factura f3 = new Factura(mario);
 
-        f3.agregar(1, camisa);
-        f3.agregar(1, computadora);
+        f3.agregarLinea(1, camisa);
+        f3.agregarLinea(1, computadora);
 
         sFacturas.agregar(f3);
     }
