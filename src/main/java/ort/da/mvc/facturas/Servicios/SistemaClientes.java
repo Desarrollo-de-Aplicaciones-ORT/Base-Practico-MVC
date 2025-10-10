@@ -37,11 +37,11 @@ public class SistemaClientes {
     }
     
    
-    public ArrayList clientesNoCompraronProductoMenorPrecio(){
+    public ArrayList<Cliente> clientesNoCompraronProductoMenorPrecio(){
           return clientesCompraronOnoProductoMenorPrecio(false);
     }
    
-    private ArrayList clientesCompraronOnoProductoMenorPrecio(boolean compraron){
+    private ArrayList<Cliente> clientesCompraronOnoProductoMenorPrecio(boolean compraron){
         Producto menor = SistemaStock.getInstancia().getProductoMenorPrecio();
         ArrayList<Cliente> retorno = new ArrayList();
         
